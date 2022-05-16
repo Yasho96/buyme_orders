@@ -32,6 +32,7 @@ router.post("/add-order", checkToken, async (req, res) => {
             title: product_respond.data.title,
             desc: product_respond.data.desc,
             img: product_respond.data.img,
+            categories: product_respond.data.categories,
             size: product_respond.data.size,
             color: product_respond.data.color,
             price: product_respond.data.price
@@ -87,6 +88,7 @@ router.post("/update-order", checkToken, async (req, res) => {
             title: product_respond.data.title,
             desc: product_respond.data.desc,
             img: product_respond.data.img,
+            categories: product_respond.data.categories,
             size: product_respond.data.size,
             color: product_respond.data.color,
             price: product_respond.data.price
