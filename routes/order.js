@@ -24,18 +24,18 @@ router.post("/add-order", checkToken, async (req, res) => {
 
       };
 
-      let product_respond = await GetProductDetailsEvent(payload);
+      let .dataproduct_respond = await GetProductDetailsEvent(payload);
       if (product_respond.status == 200) {
         let obj = {
           product: {
-            _id: product_respond.data._id,
-            title: product_respond.data.title,
-            desc: product_respond.data.desc,
-            img: product_respond.data.img,
-            categories: product_respond.data.categories,
-            size: product_respond.data.size,
-            color: product_respond.data.color,
-            price: product_respond.data.price
+            _id: product_respond.data.data._id,
+            title: product_respond.data.data.title,
+            desc: product_respond.data.data.desc,
+            img: product_respond.data.data.img,
+            categories: product_respond.data.data.categories,
+            size: product_respond.data.data.size,
+            color: product_respond.data.data.color,
+            price: product_respond.data.data.price
           },
           quantity: product.quantity
         }
@@ -84,14 +84,14 @@ router.post("/update-order", checkToken, async (req, res) => {
       if (product_respond.status == 200) {
         let obj = {
           product: {
-            _id: product_respond.data._id,
-            title: product_respond.data.title,
-            desc: product_respond.data.desc,
-            img: product_respond.data.img,
-            categories: product_respond.data.categories,
-            size: product_respond.data.size,
-            color: product_respond.data.color,
-            price: product_respond.data.price
+            _id: product_respond.data.data._id,
+            title: product_respond.data.data.title,
+            desc: product_respond.data.data.desc,
+            img: product_respond.data.data.img,
+            categories: product_respond.data.data.categories,
+            size: product_respond.data.data.size,
+            color: product_respond.data.data.color,
+            price: product_respond.data.data.price
           },
           quantity: product.quantity
         }
