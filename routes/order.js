@@ -1,96 +1,143 @@
 const Order = require("../models/Order");
-const {
-  verifyToken,
-  verifyTokenAndAuthorization,
-  verifyTokenAndAdmin,
-} = require("./verifyToken");
-
+const { checkToken } = require('../middleware/auth/tokenvalidation');
+const { GetProductDetailsEvent } = require("../middleware/events/events");
 const router = require("express").Router();
 
 //CREATE
 
-router.post("/", verifyToken, async (req, res) => {
-  const newOrder = new Order(req.body);
-
+router.post("/add-order", checkToken, async (req, res) => {
   try {
-    const savedOrder = await newOrder.save();
-    res.status(200).json(savedOrder);
+
+    if (req.body.products.length < 0) {
+      res.status(500).json({ err: 'Empty Product List', success: false })
+    }
+
+    let products_array = [];
+    for (let product of req.body.products) {
+
+      //get product details
+      let payload = {
+        event: 'GET_PRODUCT',
+        data: {
+          product_id: product.product_id
+        }
+
+      };
+
+      let product_respond = await GetProductDetailsEvent(payload);
+      if (product_respond.status == 200) {
+        let obj = {
+          product: {
+            _id: product_respond.data._id,
+            title: product_respond.data.title,
+            desc: product_respond.data.desc,
+            img: product_respond.data.img,
+            size: product_respond.data.size,
+            color: product_respond.data.color,
+            price: product_respond.data.price
+          },
+          quantity: product.quantity
+        }
+        products_array.push(obj);
+      } else {
+        res.status(500).json({ err: 'Error occured in product module. Please try again later', success: false })
+      }
+
+    }
+
+    await Order.create({
+      userId: req.user.userID,
+      products: products_array,
+      amount: req.body.amount,
+      address: req.body.address,
+    })
+
+    res.status(200).json({ success: true, msg: 'Order created' });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
 //UPDATE
-router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
+router.post("/update-order", checkToken, async (req, res) => {
+
   try {
-    const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: req.body,
-      },
-      { new: true }
-    );
-    res.status(200).json(updatedOrder);
+
+    if (req.body.products.length < 0) {
+      res.status(500).json({ err: 'Empty Product List', success: false })
+    }
+
+    let products_array = [];
+    for (let product of req.body.products) {
+
+      //get product details
+      let payload = {
+        event: 'GET_PRODUCT',
+        data: {
+          product_id: product.product_id
+        }
+
+      };
+
+      let product_respond = await GetProductDetailsEvent(payload);
+      if (product_respond.status == 200) {
+        let obj = {
+          product: {
+            _id: product_respond.data._id,
+            title: product_respond.data.title,
+            desc: product_respond.data.desc,
+            img: product_respond.data.img,
+            size: product_respond.data.size,
+            color: product_respond.data.color,
+            price: product_respond.data.price
+          },
+          quantity: product.quantity
+        }
+        products_array.push(obj);
+      } else {
+        res.status(500).json({ err: 'Error occured in product module. Please try again later', success: false })
+      }
+
+    }
+
+    await Order.findByIdAndUpdate(req.body.order_id, {
+      userId: req.user.userID,
+      products: products_array,
+      amount: req.body.amount,
+      address: req.body.address,
+    }, { new: true })
+
+    res.status(200).json({ success: true, msg: 'Order created' });
   } catch (err) {
     res.status(500).json(err);
   }
+
 });
 
 //DELETE
-router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
+router.post("/delete-order", checkToken, async (req, res) => {
   try {
-    await Order.findByIdAndDelete(req.params.id);
-    res.status(200).json("Order has been deleted...");
+    await Order.findByIdAndDelete(req.body.order_id);
+    res.status(200).json({ msg: "Order has been deleted...",success:true });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//GET USER ORDERS
-router.get("/find/:userId", verifyTokenAndAuthorization, async (req, res) => {
+
+router.get("/get-order", checkToken, async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.params.userId });
-    res.status(200).json(orders);
+    const orders = await Order.findById(req.body.order_id);
+    res.status(200).json({ data: orders,success:true });
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-// //GET ALL
-
-router.get("/", verifyTokenAndAdmin, async (req, res) => {
+router.get("/get-all-orders", checkToken, async (req, res) => {
   try {
-    const orders = await Order.find();
-    res.status(200).json(orders);
-  } catch (err) {
-    res.status(500).json(err);
-  }
-});
-
-// GET MONTHLY INCOME
-
-router.get("/income", verifyTokenAndAdmin, async (req, res) => {
-  const date = new Date();
-  const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
-  const previousMonth = new Date(new Date().setMonth(lastMonth.getMonth() - 1));
-
-  try {
-    const income = await Order.aggregate([
-      { $match: { createdAt: { $gte: previousMonth } } },
-      {
-        $project: {
-          month: { $month: "$createdAt" },
-          sales: "$amount",
-        },
-      },
-      {
-        $group: {
-          _id: "$month",
-          total: { $sum: "$sales" },
-        },
-      },
-    ]);
-    res.status(200).json(income);
+    const orders = await Order.find({ userId :req.user.userID});
+    res.status(200).json({ data: orders,success:true });
   } catch (err) {
     res.status(500).json(err);
   }
