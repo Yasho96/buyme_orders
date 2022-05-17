@@ -10,7 +10,7 @@ env:
   GKE_CLUSTER: buyme-order-cluster
   GAR_LOCATION: asia-southeast1
   GKE_ZONE: asia-southeast1
-  DEPLOYMENT_NAME: buyme_orders
+  DEPLOYMENT_NAME: yasho96/buyme_orders:latest
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USER_NAME }}/buyme_order:v1
+          tags: ${{ secrets.DOCKER_USER_NAME }}/yasho96/buyme_orders:latest
 
   deploy:
     name: Deploy to GKE
