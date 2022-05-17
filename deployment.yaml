@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buyme-orders
+spec:
+  selector:
+    matchLabels:
+      app: buyme-orders
+  replicas: 1 #for scalability purposes
+  template:
+    metadata:
+      labels:
+        app: buyme-orders
+    spec:
+      containers:
+        - name: buyme-orders
+          image: yasho96/buyme_orders:latest
+          ports:
+            - containerPort: 5000
