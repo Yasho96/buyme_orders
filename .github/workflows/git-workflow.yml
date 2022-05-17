@@ -1,5 +1,10 @@
 name: Docker Build Deploy
 
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
 env:
   PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
   GKE_CLUSTER: buyme-order-cluster
