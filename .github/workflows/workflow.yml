@@ -10,7 +10,7 @@ env:
   GKE_CLUSTER: buyme-order-cluster
   GAR_LOCATION: asia-southeast1
   GKE_ZONE: asia-southeast1
-  DEPLOYMENT_NAME: buyme_orders:latest
+  DEPLOYMENT_NAME: buyme_orders
 
 jobs:
   build:
