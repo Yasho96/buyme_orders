@@ -9,7 +9,7 @@ env:
   PROJECT_ID: ${{ secrets.GOOGLE_CLOUD_PROJECT_ID }}
   GKE_CLUSTER: buyme-order-cluster
   GAR_LOCATION: asia-southeast1
-  GKE_ZONE: asia-southeast1
+  GKE_ZONE: asia-southeast1-a
   DEPLOYMENT_NAME: buyme_orders
 
 jobs:
